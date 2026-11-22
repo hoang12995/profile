@@ -19,3 +19,14 @@ if(matchMedia('(pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion: r
 function resize(){dpr=Math.min(devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;canvas.width=w*dpr;canvas.height=h*dpr;canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);const count=Math.min(65,Math.max(24,Math.floor(w*h/22000)));particles=Array.from({length:count},()=>({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.22,vy:-(.12+Math.random()*.28),r:.6+Math.random()*1.5,a:.12+Math.random()*.35}));}
 function draw(){ctx.clearRect(0,0,w,h);for(const p of particles){p.x+=p.vx;p.y+=p.vy;if(p.y<-10)p.y=h+10;if(p.x<-10)p.x=w+10;if(p.x>w+10)p.x=-10;const dx=p.x-mouse.x,dy=p.y-mouse.y,dist=Math.hypot(dx,dy);if(dist<100&&dist>0){p.x+=dx/dist*.04;p.y+=dy/dist*.04;}ctx.beginPath();ctx.fillStyle=`rgba(201,250,98,${p.a})`;ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}raf=requestAnimationFrame(draw);}
 addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY},{passive:true});addEventListener('resize',resize);resize();draw();document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAnimationFrame(raf);else draw();});})();
+
+
+// Premium mobile navigation, card spotlight and section polish
+(()=>{
+ const header=document.querySelector('.nav'),toggle=document.getElementById('menu-toggle'),nav=document.getElementById('site-nav');
+ if(header&&toggle&&nav){toggle.addEventListener('click',()=>{const open=header.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close navigation':'Open navigation')});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{header.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')}));document.addEventListener('click',e=>{if(!header.contains(e.target)){header.classList.remove('menu-open');toggle.setAttribute('aria-expanded','false')}})}
+ if(matchMedia('(pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('.rank-card,.gear-card').forEach(card=>card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();card.style.setProperty('--mx',`${e.clientX-r.left}px`);card.style.setProperty('--my',`${e.clientY-r.top}px`)}))}
+ // Reveal non-card section elements progressively, with graceful fallback.
+ const extras=document.querySelectorAll('.hero-visual,.about-text,.chips,.quote blockquote,.contact-links');
+ if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches){extras.forEach(el=>{el.classList.add('premium-reveal');const io=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('premium-visible');io.disconnect()}})},{threshold:.12});io.observe(el)})}else extras.forEach(el=>el.classList.add('premium-visible'));
+})();
