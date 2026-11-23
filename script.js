@@ -30,3 +30,14 @@ addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY},{passive:t
  const extras=document.querySelectorAll('.hero-visual,.about-text,.chips,.quote blockquote,.contact-links');
  if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches){extras.forEach(el=>{el.classList.add('premium-reveal');const io=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('premium-visible');io.disconnect()}})},{threshold:.12});io.observe(el)})}else extras.forEach(el=>el.classList.add('premium-visible'));
 })();
+
+
+// WOW edition: cinematic intro, cursor ring, and restrained pointer parallax
+(()=>{
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const ring=document.querySelector('.z2z-pointer-ring');
+ if(ring&&matchMedia('(pointer:fine)').matches&&!reduced){let rx=0,ry=0,tx=0,ty=0;addEventListener('mousemove',e=>{tx=e.clientX;ty=e.clientY;ring.style.left=tx+'px';ring.style.top=ty+'px'},{passive:true});document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('is-hover'));el.addEventListener('mouseleave',()=>ring.classList.remove('is-hover'))});}
+ if(!reduced&&matchMedia('(pointer:fine)').matches){const visual=document.querySelector('.hero-visual'),frame=document.querySelector('.frame');if(visual&&frame){visual.addEventListener('mousemove',e=>{const r=visual.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;frame.style.transform=`rotate(0deg) translateY(-3px) perspective(1000px) rotateX(${(-y*2.4).toFixed(2)}deg) rotateY(${(x*2.4).toFixed(2)}deg)`},{passive:true});visual.addEventListener('mouseleave',()=>frame.style.transform='');}}
+ // Add a low-key magnetic feel to primary actions only on desktop.
+ if(!reduced&&matchMedia('(pointer:fine)').matches)document.querySelectorAll('.btn.primary').forEach(btn=>{btn.addEventListener('mousemove',e=>{const r=btn.getBoundingClientRect();btn.style.transform=`translate(${((e.clientX-r.left)/r.width-.5)*5}px,${((e.clientY-r.top)/r.height-.5)*4}px)`});btn.addEventListener('mouseleave',()=>btn.style.transform='')});
+})();
